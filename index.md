@@ -236,9 +236,10 @@ Responsibilities:
 
 * Accepts CLI parameters: `--year` and `--month`.
 * Builds input/output paths based on these values:
-
+  
   * Local file: `/opt/de_project/data/yellow_tripdata_YYYY-MM.parquet`
   * Landing path: `s3a://<bucket>/landing/taxi/year=YYYY/month=MM/`
+    
 * Reads the Parquet file and writes to MinIO using the S3A connector.
 
 ### `spark_jobs/transform_prepared.py`
@@ -256,6 +257,7 @@ Responsibilities:
     * `dropoff_date`
     * `trip_duration_min`
     * `avg_mph`
+      
   * Casts core fields to appropriate types.
 * Writes transformed data into Prepared, partitioned by `pickup_date`.
 
