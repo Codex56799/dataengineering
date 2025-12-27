@@ -61,6 +61,8 @@ curl -L "https://d37ci6vzurychx.cloudfront.net/trip-data/yellow_tripdata_2024-01
   -o data/yellow_tripdata_2024-01.parquet
 ```
 
+The following table describes the key fields in the dataset:
+
 | Field Name              | Description |
 |-------------------------|-------------|
 | **VendorID** | A code indicating the TPEP provider that provided the record. Possible values: Creative Mobile Technologies; VeriFone Inc. |
@@ -90,6 +92,8 @@ More data can be found in [TLC Trip Record Data](https://www.nyc.gov/site/tlc/ab
 ## 4. System Architecture
 
 ### High-Level Flow
+
+![Technologies](assets/stack.png)
 
 ```
 Local → Spark (Ingest) → MinIO Landing → Spark (Transform) → MinIO Prepared → DuckDB → Jupyter
