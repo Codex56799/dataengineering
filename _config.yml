@@ -1,5 +1,5 @@
-title: "Data Engineering Project"
-description: "A containerized Spark, Airflow, MinIO (S3) & DuckDB data engineering project using NYC Yellow Taxi data."
+title: "TLC Trip Record Data"
+description: "A containerized Spark, Airflow, MinIO (S3) & DuckDB data engineering project using NYC Yellow Taxi Trip Data."
 theme: jekyll-theme-cayman
 
 author: "Anass Yarroudh"

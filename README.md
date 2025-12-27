@@ -91,15 +91,9 @@ More data can be found in [TLC Trip Record Data](https://www.nyc.gov/site/tlc/ab
 
 ## 4. System Architecture
 
-### High-Level Flow
+### Component Overview
 
 ![Technologies](assets/stack.png)
-
-```
-Local → Spark (Ingest) → MinIO Landing → Spark (Transform) → MinIO Prepared → DuckDB → Jupyter
-```
-
-### Component Overview
 
 | Component | Role |
 |----------|------|
@@ -109,6 +103,14 @@ Local → Spark (Ingest) → MinIO Landing → Spark (Transform) → MinIO Prepa
 | DuckDB | Analytical storage for queries and notebook exploration. |
 | JupyterLab | Notebook environment for analytics. |
 | Docker Compose | Provides full reproducible environment. |
+
+### High-Level Flow
+
+```
+Local → Spark (Ingest) → MinIO "Landing" → Spark (Transform) → MinIO "Prepared" → DuckDB → Jupyter
+```
+
+The data flows from local raw files into MinIO S3 storage (Landing), then transformed by Spark into a cleaned format (Prepared), and finally loaded into DuckDB for exploration and analysis using JupyterLab notebooks.
 
 ---
 
@@ -276,10 +278,15 @@ Ensure Airflow home has correct ownership.
 ## 13. Future Enhancements
 - Add more data quality checks
 - Add incremental ingestion using Airflow Variables
-- Add partitioning strategies
 - Add CI/CD workflows
+- Add dataset updates and versioning
 
 ---
 
 ## 14. License
 This project is distributed under the terms defined in the `LICENSE` file.
+
+---
+## 15. Acknowledgements
+- NYC Taxi & Limousine Commission for the dataset
+- Apache Spark, Airflow, MinIO, DuckDB communities for their open-source tools

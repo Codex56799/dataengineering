@@ -1,6 +1,6 @@
 # Data Engineering
 
-This project implements a fully containerized data engineering workflow for ingesting, processing, validating, and preparing NYC Yellow Taxi trip data. It uses Apache Spark for computation, Apache Airflow for orchestration, MinIO as S3-compatible object storage, DuckDB for analytics. The environment is fully reproducible through Docker Compose.
+This project implements a fully containerized data engineering workflow for ingesting, processing, validating, and preparing NYC Yellow Taxi Trip Data. It uses Apache Spark for computation, Apache Airflow for orchestration, MinIO as S3-compatible object storage and DuckDB as database for analytics. The environment is fully reproducible through Docker Compose.
 
 ---
 
@@ -30,21 +30,21 @@ The pipeline is orchestrated by Airflow and executed using Spark via containeriz
 │   └── storage_config.yaml
 ├── data
 │   └── yellow_tripdata_2024-01.parquet
-├── docker-compose.yml
 ├── infra
 │   └── docker
 │       ├── notebook.Dockerfile
 │       └── spark.Dockerfile
-├── LICENSE
 ├── notebooks
 │   └── 01_taxi_trips_exploration.ipynb
-├── README.md
-├── requirements.txt
 ├── spark_jobs
 │   ├── ingest_landing.py
 │   └── transform_prepared.py
-└── warehouse
+├── warehouse
     └── taxi.duckdb
+├── README.md
+├── docker-compose.yml
+├── LICENSE
+└── requirements.txt
 ```
 
 ---
@@ -61,17 +61,39 @@ curl -L "https://d37ci6vzurychx.cloudfront.net/trip-data/yellow_tripdata_2024-01
   -o data/yellow_tripdata_2024-01.parquet
 ```
 
+The following table describes the key fields in the dataset:
+
+| Field Name              | Description |
+|-------------------------|-------------|
+| **VendorID** | A code indicating the TPEP provider that provided the record. Possible values: Creative Mobile Technologies; VeriFone Inc. |
+| **tpep_pickup_datetime** | The date and time when the meter was engaged. |
+| **tpep_dropoff_datetime** | The date and time when the meter was disengaged. |
+| **Passenger_count** | The number of passengers in the vehicle. This is a driver-entered value. |
+| **Trip_distance** | The elapsed trip distance in miles reported by the taximeter. |
+| **Pickup_longitude** | Longitude where the meter was engaged. |
+| **Pickup_latitude** | Latitude where the meter was engaged. |
+| **RateCodeID** | The final rate code in effect at the end of the trip. Possible values: Standard rate; JFK; Newark; Nassau or Westchester; Negotiated fare; Group ride. |
+| **Store_and_fwd_flag** | Indicates whether the trip record was held in vehicle memory before sending to the vendor (“store and forward”). Values: Y = store and forward trip; N = not a store and forward trip. |
+| **Dropoff_longitude** | Longitude where the meter was disengaged. |
+| **Dropoff_latitude** | Latitude where the meter was disengaged. |
+| **Payment_type** | A numeric code signifying how the passenger paid for the trip. Possible values: Credit card; Cash; No charge; Dispute; Unknown; Voided trip. |
+| **Fare_amount** | The time-and-distance fare calculated by the meter. |
+| **Extra** | Miscellaneous extras and surcharges, including the $0.50 and $1 rush hour and overnight charges. |
+| **MTA_tax** | $0.50 MTA tax automatically triggered based on the metered rate in use. |
+| **Improvement_surcharge** | $0.30 improvement surcharge assessed at the flag drop; introduced in 2015. |
+| **Tip_amount** | Tip amount. Automatically populated for credit card tips; cash tips are not included. |
+| **Tolls_amount** | Total amount of all tolls paid in the trip. |
+| **Total_amount** | The total amount charged to passengers. Does not include cash tips. |
+
+More data can be found in [TLC Trip Record Data](https://www.nyc.gov/site/tlc/about/tlc-trip-record-data.page).
+
 ---
 
 ## 4. System Architecture
 
-### High-Level Flow
-
-```
-Local → Spark (Ingest) → MinIO Landing → Spark (Transform) → MinIO Prepared → DuckDB → Jupyter
-```
-
 ### Component Overview
+
+![Technologies](assets/stack.png)
 
 | Component | Role |
 |----------|------|
@@ -81,6 +103,14 @@ Local → Spark (Ingest) → MinIO Landing → Spark (Transform) → MinIO Prepa
 | DuckDB | Analytical storage for queries and notebook exploration. |
 | JupyterLab | Notebook environment for analytics. |
 | Docker Compose | Provides full reproducible environment. |
+
+### High-Level Flow
+
+```
+Local → Spark (Ingest) → MinIO "Landing" → Spark (Transform) → MinIO "Prepared" → DuckDB → Jupyter
+```
+
+The data flows from local raw files into MinIO S3 storage (Landing), then transformed by Spark into a cleaned format (Prepared), and finally loaded into DuckDB for exploration and analysis using JupyterLab notebooks.
 
 ---
 
@@ -248,10 +278,15 @@ Ensure Airflow home has correct ownership.
 ## 13. Future Enhancements
 - Add more data quality checks
 - Add incremental ingestion using Airflow Variables
-- Add partitioning strategies
 - Add CI/CD workflows
+- Add dataset updates and versioning
 
 ---
 
 ## 14. License
 This project is distributed under the terms defined in the `LICENSE` file.
+
+---
+## 15. Acknowledgements
+- NYC Taxi & Limousine Commission for the dataset
+- Apache Spark, Airflow, MinIO, DuckDB communities for their open-source tools
