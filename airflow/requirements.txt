@@ -1,0 +1,4 @@
+# Airflow-specific Python dependencies
+
+pyyaml
+boto3

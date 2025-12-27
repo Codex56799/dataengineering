@@ -1,0 +1,9 @@
+title: "Data Engineering Project"
+description: "A containerized Spark, Airflow, MinIO (S3) & DuckDB data engineering project using NYC Yellow Taxi data."
+theme: jekyll-theme-cayman
+
+author: "Anass Yarroudh"
+show_downloads: false
+github:
+  is_project_page: true
+  repository_url: "https://github.com/Yarroudh/dataengineering"
