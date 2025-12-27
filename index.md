@@ -373,8 +373,8 @@ python -c "from cryptography.fernet import Fernet; print(Fernet.generate_key().d
 ### Step 1 — Prepare environment
 
 ```bash
-git clone <this-repo-url>
-cd <this-repo>
+git clone https://github.com/Yarroudh/dataengineering
+cd dataengineering
 cp .env.example .env
 ```
 
