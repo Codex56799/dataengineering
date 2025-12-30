@@ -1,6 +1,11 @@
 # Data Engineering
 
 [![CI](https://github.com/Yarroudh/dataengineering/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/Yarroudh/dataengineering/actions/workflows/ci.yml)
+![License](https://img.shields.io/github/license/Yarroudh/dataengineering)
+![Last commit](https://img.shields.io/github/last-commit/Yarroudh/dataengineering)
+![Python](https://img.shields.io/badge/python-3.11-blue)
+![Ruff](https://img.shields.io/badge/lint-ruff-261230)
+![Trivy](https://img.shields.io/badge/security-trivy-1904DA)
 
 This project implements a fully containerized data engineering workflow for downloading, ingesting, transforming, validating, and preparing NYC Yellow Taxi Trip Data. It uses **Apache Spark** for computation, **Apache Airflow** for orchestration, **MinIO** as **Amazon S3**-compatible object storage, and **DuckDB** as an analytics warehouse. The entire environment is reproducible using Docker Compose and set to run locally.
 
