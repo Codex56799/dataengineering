@@ -11,7 +11,7 @@ concurrency:
 
 jobs:
   ruff:
-    name: ruff (lint + format)
+    name: ruff [lint & format check]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -27,7 +27,7 @@ jobs:
           args: "format --check ."
 
   python-sanity:
-    name: python sanity (compile)
+    name: python sanity [compile sources]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -42,7 +42,7 @@ jobs:
           python -m compileall airflow/dags spark_jobs
 
   docker-build:
-    name: docker (validate + build)
+    name: docker [build images]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -120,7 +120,7 @@ jobs:
           cache-to: type=gha,mode=max
 
   trivy-scan:
-    name: trivy (filesystem scan)
+    name: trivy [vulnerability scan]
     runs-on: ubuntu-latest
     needs: docker-build
     if: github.ref == 'refs/heads/main'
