@@ -514,10 +514,10 @@ docker compose logs <service>
 
 ## 15. Future Enhancements
 
-* Add data quality checks (e.g., Great Expectations / Deequ).
-* Implement incremental and multi-month ingestion.
-* Add CI/CD workflows.
-* Introduce dataset versioning and data catalog integration.
+- [ ] Add data quality checks (e.g., Great Expectations / Deequ).
+- [ ] Implement incremental and multi-month ingestion.
+- [x] Add CI workflows.
+- [ ] Introduce dataset versioning and data catalog integration.
 
 ---
 
